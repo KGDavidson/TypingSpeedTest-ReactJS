@@ -152,6 +152,7 @@ const Input = (props) => {
     return (
         <div className="input">
             <div className="mask">{displayTextArray}</div>
+            <div className="cursor"></div>
         </div>
     );
 };

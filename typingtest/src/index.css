@@ -22,6 +22,7 @@ code {
 }
 
 .input {
+    position: relative;
     height: 120px;
     width: 80vw;
     max-width: 1500px;
@@ -79,4 +80,22 @@ pre {
 
 .fixed {
     background-color: #fecab9;
+}
+
+.cursor {
+    position: absolute;
+    height: 100px;
+    width: 8px;
+    left: 50.7%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    /* background-color: black; */
+    background-image: linear-gradient(#fec982, #ff9f67);
+    animation: cursor-blink 1s steps(2) infinite;
+}
+
+@keyframes cursor-blink {
+    0% {
+        opacity: 0;
+    }
 }
