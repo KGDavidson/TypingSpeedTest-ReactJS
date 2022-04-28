@@ -24,7 +24,7 @@ code {
 .input {
     height: 120px;
     width: 80vw;
-    max-width: 1000px;
+    max-width: 1500px;
     margin-bottom: 5%;
     background-color: rgba(255, 255, 255, 0.4);
     border-radius: 20px;
@@ -54,4 +54,8 @@ code {
     font-weight: bold;
     width: 37px;
     text-align: center;
+}
+
+.negative {
+    color: red;
 }
