@@ -71,38 +71,52 @@ const Input = (props) => {
             //console.log(e.keyCode);
             //console.log(extraCharsAtFront);
 
-            var className = "char negative";
-            if (
-                propsTextArray[currentChar].props.children.props.children !=
-                e.key
-            ) {
-                console.log("test");
-                propsTextArray[currentChar] = (
-                    <div className={className} key={currentChar}>
-                        <pre>{e.key}</pre>
-                    </div>
+            if (currentChar < props.textArray.length) {
+                if (
+                    props.textArray[currentChar].props.children.props
+                        .children != e.key
+                ) {
+                    var className = "char negative";
+                    console.log("test");
+                    propsTextArray[currentChar] = (
+                        <div className={className} key={currentChar}>
+                            <pre>{e.key}</pre>
+                        </div>
+                    );
+                } else {
+                    var className = "char positive";
+                    if (
+                        propsTextArray[currentChar].props.className.includes(
+                            "negative"
+                        )
+                    )
+                        className = "char fixed";
+                    propsTextArray[currentChar] = (
+                        <div className={className} key={currentChar}>
+                            <pre>{e.key}</pre>
+                        </div>
+                    );
+                }
+                props.setTextArray(propsTextArray);
+
+                console.log(
+                    props.textArray[currentChar].props.children.props.children
                 );
+                //_setDisplayTextArray(textArray);
+
+                extraCharsAtFront--;
+                if (extraCharsAtEnd < props.textArray.length) extraCharsAtEnd++;
+                setDisplayTextArray();
+
+                //console.log(text[currentChar].props.children.props.children);
+                /*text[currentChar] = (
+                    <div className="char negative" key={currentChar}>
+                        <pre>{text[currentChar].props.children.props.children}</pre>
+                    </div>
+                );*/
+                //_setTextArray(text);\
+                currentChar++;
             }
-            console.log(propsTextArray);
-            props.setTextArray(propsTextArray);
-
-            console.log(
-                props.textArray[currentChar].props.children.props.children
-            );
-            //_setDisplayTextArray(textArray);
-
-            extraCharsAtFront--;
-            if (extraCharsAtEnd < props.textArray.length) extraCharsAtEnd++;
-            setDisplayTextArray();
-
-            //console.log(text[currentChar].props.children.props.children);
-            /*text[currentChar] = (
-                <div className="char negative" key={currentChar}>
-                    <pre>{text[currentChar].props.children.props.children}</pre>
-                </div>
-            );*/
-            //_setTextArray(text);\
-            currentChar++;
             e.stopPropagation();
             e.preventDefault();
         });
@@ -113,11 +127,22 @@ const Input = (props) => {
                     if (extraCharsAtEnd > 0) extraCharsAtEnd--;
                     currentChar--;
 
+                    console.log(propsTextArray[currentChar].props.className);
+
+                    var className =
+                        propsTextArray[currentChar].props.className + " erased";
+
                     propsTextArray[currentChar] = (
-                        <div className="char" key={currentChar}>
-                            <pre>{props.textArray[currentChar]}</pre>
+                        <div className={className} key={currentChar}>
+                            <pre>
+                                {
+                                    props.textArray[currentChar].props.children
+                                        .props.children
+                                }
+                            </pre>
                         </div>
                     );
+                    props.setTextArray(propsTextArray);
                 }
                 setDisplayTextArray();
             }

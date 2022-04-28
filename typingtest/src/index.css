@@ -49,13 +49,34 @@ code {
     );
 }
 
+pre {
+    line-height: normal;
+    margin: 0;
+}
+
 .char {
     font-family: "Roboto", sans-serif;
     font-weight: bold;
     width: 37px;
+    height: auto;
     text-align: center;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+.positive {
+    background-color: #a9dbd4;
 }
 
 .negative {
-    color: red;
+    background-color: #ed744c;
+}
+
+.erased {
+    background-color: transparent;
+}
+
+.fixed {
+    background-color: #fecab9;
 }
