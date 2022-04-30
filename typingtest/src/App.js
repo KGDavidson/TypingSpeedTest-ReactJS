@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useRef } from "react";
 import paragraphs from "./paragraphs.json";
 
 const charsFitted = Math.floor(Math.min(window.innerWidth * 0.8, 1500) / 37);
@@ -9,10 +9,19 @@ var extraCharsAtEnd = initialExtraChars;
 var currentChar = 0;
 
 const getRandomText = () => {
-    return paragraphs.data[Math.round(Math.random() * 347)].paragraph;
+    return (
+        paragraphs.data[Math.round(Math.random() * 347)].paragraph +
+        " " +
+        paragraphs.data[Math.round(Math.random() * 347)].paragraph +
+        " " +
+        paragraphs.data[Math.round(Math.random() * 347)].paragraph
+    );
 };
 
 const App = () => {
+    const startTimer = useRef(null);
+    const endTimer = useRef(null);
+
     const getTextArray = (text) => {
         return text.split("").map((c, index) => {
             return (
@@ -22,21 +31,148 @@ const App = () => {
             );
         });
     };
-    const [textArray, setTextArray] = useState(
-        getTextArray(
-            'The robot clicked disapprovingly, gurgled briefly inside its cubical interior and extruded a pony glass of brownish liquid. "Sir, you will undoubtedly end up in a drunkard\'s grave, dead of hepatic cirrhosis," it informed me virtuously as it returned my ID card. I glared as I pushed the glass across the table.'
-        )
-    );
+    const [textArray, setTextArray] = useState(getTextArray(getRandomText()));
+    const [enabled, setEnabled] = useState(true);
+
+    const startTimerCallback = () => {
+        startTimer.current();
+    };
+
+    const endTimerCallback = () => {
+        setEnabled(false);
+        endTimer.current();
+    };
 
     return (
         <div className="container">
-            <Input textArray={textArray} setTextArray={setTextArray}></Input>
+            {enabled ? (
+                <Timer
+                    endTimerCallback={endTimerCallback}
+                    startTimer={startTimer}
+                ></Timer>
+            ) : (
+                <Results textArray={textArray}></Results>
+            )}
+
+            <Input
+                endTimer={endTimer}
+                textArray={textArray}
+                setTextArray={setTextArray}
+                startTimerCallback={startTimerCallback}
+            ></Input>
+        </div>
+    );
+};
+
+const Results = (props) => {
+    var wpm = 0;
+    var cpm = 0;
+    var acc = 0;
+    var racc = 0;
+
+    var charsCorrect = 0;
+    var charsFixed = 0;
+    var charsIncorrect = 0;
+
+    props.textArray.forEach((e) => {
+        const className = e.props.className;
+        if (className.includes("positive") && !className.includes("erased"))
+            charsCorrect++;
+        if (className.includes("fixed")) charsFixed++;
+        if (className.includes("negative") && !className.includes("erased"))
+            charsIncorrect++;
+    });
+
+    cpm = charsCorrect + charsIncorrect;
+    wpm = cpm / 5;
+    acc =
+        Math.round(
+            ((charsFixed + charsCorrect) /
+                (charsFixed + charsCorrect + charsIncorrect)) *
+                1000
+        ) /
+            10 +
+        "%";
+    racc =
+        Math.round(
+            (charsCorrect / (charsFixed + charsCorrect + charsIncorrect)) * 1000
+        ) /
+            10 +
+        "%";
+
+    const reload = () => {
+        window.location.reload(false);
+    };
+
+    return (
+        <div className="results">
+            <div className="wpm">
+                {wpm}
+                <span>WPM</span>
+            </div>
+            <div className="cpm">
+                {cpm}
+                <span>CPM</span>
+            </div>
+            <div className="acc">
+                {acc}
+                <span>Accuracy</span>
+            </div>
+            <div className="racc">
+                {racc}
+                <span>Real Accuracy</span>
+            </div>
+            <div className="restart" onClick={reload}>
+                <span>⭮</span>
+            </div>
+        </div>
+    );
+};
+
+const Timer = (props) => {
+    const totalTime = 60;
+    var time = totalTime;
+    var timer;
+    const [timerValue, setTimerValue] = useState(time);
+
+    const countDown = () => {
+        if (time > 0) {
+            time -= 1;
+            setTimerValue(time);
+        } else {
+            clearInterval(timer);
+            props.endTimerCallback();
+        }
+    };
+
+    const startTimer = () => {
+        timer = setInterval(countDown, 1000);
+    };
+
+    useEffect(() => {
+        props.startTimer.current = startTimer;
+    });
+
+    const style = {
+        background: `radial-gradient(rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.6)${
+            Math.pow(timerValue / totalTime, 2) * 50
+        }%, rgba(255, 255, 255, 0.2) ${
+            Math.pow(timerValue / totalTime, 2) * 50
+        }%, rgba(255, 255, 255, 0.2) 100%)`,
+    };
+
+    return (
+        <div className="timer" style={style}>
+            {timerValue}
         </div>
     );
 };
 
 const Input = (props) => {
     var propsTextArray = [...props.textArray];
+    var started = false;
+
+    const [enabled, setEnabled] = useState(1);
 
     const getDisplayTextArray = () => {
         var textArray = propsTextArray.slice(0, extraCharsAtEnd);
@@ -65,26 +201,27 @@ const Input = (props) => {
         _setDisplayTextArray(getDisplayTextArray());
     };
 
-    useEffect(() => {
-        window.addEventListener("keypress", (e) => {
-            //console.log(textArray[currentChar].props.children.props.children);
-            //console.log(e.keyCode);
-            //console.log(extraCharsAtFront);
+    const handleKeyPress = (e) => {
+        if (enabled && e.keyCode !== 13) {
+            var className = "";
+            if (!started) {
+                started = true;
+                props.startTimerCallback();
+            }
 
             if (currentChar < props.textArray.length) {
                 if (
                     props.textArray[currentChar].props.children.props
-                        .children != e.key
+                        .children !== e.key
                 ) {
-                    var className = "char negative";
-                    console.log("test");
+                    className = "char negative";
                     propsTextArray[currentChar] = (
                         <div className={className} key={currentChar}>
                             <pre>{e.key}</pre>
                         </div>
                     );
                 } else {
-                    var className = "char positive";
+                    className = "char positive";
                     if (
                         propsTextArray[currentChar].props.className.includes(
                             "negative"
@@ -99,35 +236,23 @@ const Input = (props) => {
                 }
                 props.setTextArray(propsTextArray);
 
-                console.log(
-                    props.textArray[currentChar].props.children.props.children
-                );
-                //_setDisplayTextArray(textArray);
-
                 extraCharsAtFront--;
                 if (extraCharsAtEnd < props.textArray.length) extraCharsAtEnd++;
                 setDisplayTextArray();
-
-                //console.log(text[currentChar].props.children.props.children);
-                /*text[currentChar] = (
-                    <div className="char negative" key={currentChar}>
-                        <pre>{text[currentChar].props.children.props.children}</pre>
-                    </div>
-                );*/
-                //_setTextArray(text);\
                 currentChar++;
             }
             e.stopPropagation();
             e.preventDefault();
-        });
-        window.addEventListener("keydown", (e) => {
-            if (e.keyCode == 8) {
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (enabled) {
+            if (e.keyCode === 8) {
                 if (extraCharsAtFront < initialExtraChars) {
                     extraCharsAtFront++;
                     if (extraCharsAtEnd > 0) extraCharsAtEnd--;
                     currentChar--;
-
-                    console.log(propsTextArray[currentChar].props.className);
 
                     var className =
                         propsTextArray[currentChar].props.className + " erased";
@@ -146,8 +271,31 @@ const Input = (props) => {
                 }
                 setDisplayTextArray();
             }
-        });
-    }, []);
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener("keypress", handleKeyPress);
+
+        return () => {
+            window.removeEventListener("keypress", handleKeyPress);
+        };
+    }, [enabled]);
+
+    useEffect(() => {
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [enabled]);
+
+    const endTimer = () => {
+        setEnabled(0);
+    };
+
+    useEffect(() => {
+        props.endTimer.current = endTimer;
+    });
 
     return (
         <div className="input">
