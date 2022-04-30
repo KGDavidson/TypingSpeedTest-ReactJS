@@ -3,13 +3,14 @@
 Typing speed test app made using ReactJS with all custom components. Text is chosen at random from a `paragraphs.json` file
 
 ![UI](https://i.postimg.cc/cLbtSWQV/GIF-30-04-2022-11-02-26.gif)
-![UI](https://i.postimg.cc/qgHh3vZY/Screenshot-2022-04-30-105105.png)
+![UI](https://i.postimg.cc/J4r4ThyR/Screenshot-2022-04-30-124330.png)
 
 ---
 
 ## Features
 
 -   A random paragraph is selected for the test from the paragraphs JSON file
+-   Use of localStorage to store and report independent highscores for cpm and wpm
 -   Countdown clock for time typing test
 -   Timer begins when the user starts to type
 -   Responsive UI

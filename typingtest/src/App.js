@@ -100,6 +100,23 @@ const Results = (props) => {
             10 +
         "%";
 
+    var cpmNewHighScore = false;
+    var wpmNewHighScore = false;
+
+    //localStorage.setItem("maxWpm", 0);
+    //localStorage.setItem("maxCpm", 0);
+
+    const maxWpm = localStorage.getItem("maxWpm");
+    const maxCpm = localStorage.getItem("maxCpm");
+    if (maxWpm === null || maxWpm < wpm) {
+        wpmNewHighScore = true;
+        localStorage.setItem("maxWpm", wpm);
+    }
+    if (maxCpm === null || maxCpm < cpm) {
+        cpmNewHighScore = true;
+        localStorage.setItem("maxCpm", cpm);
+    }
+
     const reload = () => {
         window.location.reload(false);
     };
@@ -109,10 +126,20 @@ const Results = (props) => {
             <div className="wpm">
                 {wpm}
                 <span>WPM</span>
+                {wpmNewHighScore ? (
+                    <span className="newHighScore">New High Score</span>
+                ) : (
+                    <span></span>
+                )}
             </div>
             <div className="cpm">
                 {cpm}
                 <span>CPM</span>
+                {cpmNewHighScore ? (
+                    <span className="newHighScore">New High Score</span>
+                ) : (
+                    <span></span>
+                )}
             </div>
             <div className="acc">
                 {acc}

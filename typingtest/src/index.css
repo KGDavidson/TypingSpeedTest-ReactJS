@@ -130,6 +130,7 @@ pre {
     font-size: 30px;
     font-weight: bolder;
     border-radius: 15px;
+    position: relative;
 }
 
 .restart {
@@ -152,4 +153,16 @@ pre {
 .results {
     display: flex;
     flex-direction: row;
+}
+
+span.newHighScore {
+    position: absolute;
+    text-transform: uppercase;
+    color: #ed744c;
+    font-weight: bolder;
+    font-size: 13px;
+    bottom: 10px;
+    right: -20px;
+    transform: rotate(-10deg);
+    text-shadow: 0 0 1.5em rgba(128, 128, 128, 0.658);
 }
