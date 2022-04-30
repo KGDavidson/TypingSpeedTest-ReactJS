@@ -1,6 +1,6 @@
 # TypingSpeedTest-ReactJS
 
-Typing speed test app made using ReactJS with all custom components. Text is chosen at random from a `paragraphs.json` file
+Typing speed test app made using ReactJS that uses localStorage to store highscores. Text is chosen at random from a `paragraphs.json` file
 
 ![UI](https://i.postimg.cc/cLbtSWQV/GIF-30-04-2022-11-02-26.gif)
 ![UI](https://i.postimg.cc/J4r4ThyR/Screenshot-2022-04-30-124330.png)
