@@ -9,11 +9,10 @@ Typing speed test app made using ReactJS that uses localStorage to store highsco
 
 ## Features
 
--   A random paragraph is selected for the test from the paragraphs JSON file
--   Use of localStorage to store and report independent highscores for cpm and wpm
--   Countdown clock for time typing test
+-   A random paragraph is selected for typing from the paragraphs JSON file
+-   localStorage is used to store and report independent highscores for cpm and wpm
+-   Countdown clock for timing typing test
 -   Timer begins when the user starts to type
--   Responsive UI
 -   Typing stats are calculated at the end and presented in an organised way
 -   Highlights characters that were typed correctly, incorrectly or fixed in their respective colours
 
