@@ -157,7 +157,7 @@ const Results = (props) => {
 };
 
 const Timer = (props) => {
-    const totalTime = 60;
+    const totalTime = 30;
     var time = totalTime;
     var timer;
     const [timerValue, setTimerValue] = useState(time);
