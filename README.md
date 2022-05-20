@@ -20,7 +20,7 @@ Typing speed test app made using ReactJS that uses localStorage to store highsco
 
 ## Demo
 
--   Demo available at https://kgdavidson.github.io/TypingSpeedTest-ReactJS/
+-   Demo available at https://peditious.my.to/
 
 ---
 
