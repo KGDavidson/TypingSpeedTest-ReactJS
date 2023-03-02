@@ -2,7 +2,7 @@ import { React, useState, useEffect, useRef } from "react";
 import paragraphs from "./paragraphs.json";
 
 const charsFitted = Math.floor(Math.min(window.innerWidth * 0.8, 1500) / 37);
-
+const totalTime = 15;
 const initialExtraChars = Math.floor(charsFitted / 2);
 var extraCharsAtFront = initialExtraChars;
 var extraCharsAtEnd = initialExtraChars;
@@ -33,6 +33,12 @@ const App = () => {
     };
     const [textArray, setTextArray] = useState(getTextArray(getRandomText()));
     const [enabled, setEnabled] = useState(true);
+    const [charsCorrect, setCharsCorrect ] = useState(0)
+    const [charsFixed, setCharsFixed ] = useState(0)
+    const [charsIncorrect, setCharsIncorrect ] = useState(0)
+
+    console.log(charsCorrect, charsFixed, charsIncorrect)
+
 
     const startTimerCallback = () => {
         startTimer.current();
@@ -51,10 +57,18 @@ const App = () => {
                     startTimer={startTimer}
                 ></Timer>
             ) : (
-                <Results textArray={textArray}></Results>
+                <Results
+                  textArray={textArray}
+                  charsCorrect={charsCorrect}
+                  charsFixed={charsFixed}
+                  charsIncorrect={charsIncorrect}
+                />
             )}
 
             <Input
+                setCharsCorrect={setCharsCorrect}
+                setCharsFixed={setCharsFixed}
+                setCharsIncorrect={setCharsIncorrect}
                 endTimer={endTimer}
                 textArray={textArray}
                 setTextArray={setTextArray}
@@ -70,20 +84,13 @@ const Results = (props) => {
     var acc = 0;
     var racc = 0;
 
-    var charsCorrect = 0;
-    var charsFixed = 0;
-    var charsIncorrect = 0;
+    const {
+      charsCorrect,
+      charsFixed,
+      charsIncorrect,
+    } = props;
 
-    props.textArray.forEach((e) => {
-        const className = e.props.className;
-        if (className.includes("positive") && !className.includes("erased"))
-            charsCorrect++;
-        if (className.includes("fixed")) charsFixed++;
-        if (className.includes("negative") && !className.includes("erased"))
-            charsIncorrect++;
-    });
-
-    cpm = charsCorrect + charsIncorrect;
+    cpm = (charsCorrect + charsIncorrect + charsFixed) * (60 / totalTime);
     wpm = cpm / 5;
     acc =
         Math.round(
@@ -157,7 +164,6 @@ const Results = (props) => {
 };
 
 const Timer = (props) => {
-    const totalTime = 30;
     var time = totalTime;
     var timer;
     const [timerValue, setTimerValue] = useState(time);
@@ -241,6 +247,7 @@ const Input = (props) => {
                     props.textArray[currentChar].props.children.props
                         .children !== e.key
                 ) {
+                    props.setCharsIncorrect((prev) => prev + 1);
                     className = "char negative";
                     propsTextArray[currentChar] = (
                         <div className={className} key={currentChar}>
@@ -248,13 +255,14 @@ const Input = (props) => {
                         </div>
                     );
                 } else {
+                  props.setCharsCorrect((prev) => prev + 1);
                     className = "char positive";
-                    if (
-                        propsTextArray[currentChar].props.className.includes(
-                            "negative"
-                        )
-                    )
-                        className = "char fixed";
+                    if (propsTextArray[currentChar].props.className.includes("negative")) {
+                      className = "char fixed";
+                      props.setCharsFixed((prev) => prev + 1);
+                      props.setCharsIncorrect((prev) => prev - 1);
+                    }
+
                     propsTextArray[currentChar] = (
                         <div className={className} key={currentChar}>
                             <pre>{e.key}</pre>
