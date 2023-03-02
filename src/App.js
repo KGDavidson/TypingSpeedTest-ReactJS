@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useRef } from "react";
+import { React, useState, useEffect, useRef, useCallback } from "react";
 import paragraphs from "./paragraphs.json";
 
 const charsFitted = Math.floor(Math.min(window.innerWidth * 0.8, 1500) / 37);
@@ -202,112 +202,112 @@ const Timer = (props) => {
 };
 
 const Input = (props) => {
-    var propsTextArray = [...props.textArray];
-    var started = false;
+    const propsTextArray = useRef([...props.textArray]);
+    const started = useRef(false);
 
     const [enabled, setEnabled] = useState(1);
 
-    const getDisplayTextArray = () => {
-        var textArray = propsTextArray.slice(0, extraCharsAtEnd);
-        if (extraCharsAtFront > 0) {
-            for (var i = 0; i < extraCharsAtFront; i++) {
-                textArray.unshift(
-                    <div className="char" key={-(i + 1)}>
-                        <pre> </pre>
-                    </div>
-                );
-            }
-        } else {
-            textArray = propsTextArray.slice(
-                -extraCharsAtFront,
-                extraCharsAtEnd
-            );
-        }
-        return textArray;
-    };
+    const getDisplayTextArray = useCallback(() => {
+      var textArray = propsTextArray.current.slice(0, extraCharsAtEnd);
+      if (extraCharsAtFront > 0) {
+          for (var i = 0; i < extraCharsAtFront; i++) {
+              textArray.unshift(
+                  <div className="char" key={-(i + 1)}>
+                      <pre> </pre>
+                  </div>
+              );
+          }
+      } else {
+          textArray = propsTextArray.current.slice(
+              -extraCharsAtFront,
+              extraCharsAtEnd
+          );
+      }
+      return textArray;
+    }, []);
 
     const [displayTextArray, _setDisplayTextArray] = useState(
         getDisplayTextArray()
     );
 
-    const setDisplayTextArray = () => {
-        _setDisplayTextArray(getDisplayTextArray());
-    };
+    const setDisplayTextArray = useCallback(() => {
+      _setDisplayTextArray(getDisplayTextArray());
+    }, [getDisplayTextArray])
 
-    const handleKeyPress = (e) => {
-        if (enabled && e.keyCode !== 13) {
-            var className = "";
-            if (!started) {
-                started = true;
-                props.startTimerCallback();
-            }
+    const handleKeyPress = useCallback((e) => {
+      if (enabled && e.keyCode !== 13) {
+          var className = "";
+          if (!started.current) {
+              started.current = true;
+              props.startTimerCallback();
+          }
 
-            if (currentChar < props.textArray.length) {
-                if (
-                    props.textArray[currentChar].props.children.props
-                        .children !== e.key
-                ) {
-                    props.setCharsIncorrect((prev) => prev + 1);
-                    className = "char negative";
-                    propsTextArray[currentChar] = (
-                        <div className={className} key={currentChar}>
-                            <pre>{e.key}</pre>
-                        </div>
-                    );
-                } else {
-                  props.setCharsCorrect((prev) => prev + 1);
-                    className = "char positive";
-                    if (propsTextArray[currentChar].props.className.includes("negative")) {
-                      className = "char fixed";
-                      props.setCharsFixed((prev) => prev + 1);
-                      props.setCharsIncorrect((prev) => prev - 1);
-                    }
+          if (currentChar < props.textArray.length) {
+              if (
+                  props.textArray[currentChar].props.children.props
+                      .children !== e.key
+              ) {
+                  props.setCharsIncorrect((prev) => prev + 1);
+                  className = "char negative";
+                  propsTextArray.current[currentChar] = (
+                      <div className={className} key={currentChar}>
+                          <pre>{e.key}</pre>
+                      </div>
+                  );
+              } else {
+                props.setCharsCorrect((prev) => prev + 1);
+                  className = "char positive";
+                  if (propsTextArray.current[currentChar].props.className.includes("negative")) {
+                    className = "char fixed";
+                    props.setCharsFixed((prev) => prev + 1);
+                    props.setCharsIncorrect((prev) => prev - 1);
+                  }
 
-                    propsTextArray[currentChar] = (
-                        <div className={className} key={currentChar}>
-                            <pre>{e.key}</pre>
-                        </div>
-                    );
-                }
-                props.setTextArray(propsTextArray);
+                  propsTextArray.current[currentChar] = (
+                      <div className={className} key={currentChar}>
+                          <pre>{e.key}</pre>
+                      </div>
+                  );
+              }
+              props.setTextArray(propsTextArray.current);
 
-                extraCharsAtFront--;
-                if (extraCharsAtEnd < props.textArray.length) extraCharsAtEnd++;
-                setDisplayTextArray();
-                currentChar++;
-            }
-            e.stopPropagation();
-            e.preventDefault();
-        }
-    };
+              extraCharsAtFront--;
+              if (extraCharsAtEnd < props.textArray.length) extraCharsAtEnd++;
+              setDisplayTextArray();
+              currentChar++;
+          }
+          e.stopPropagation();
+          e.preventDefault();
+      }
+    }, [enabled, props, setDisplayTextArray]);
 
-    const handleKeyDown = (e) => {
-        if (enabled) {
-            if (e.keyCode === 8) {
-                if (extraCharsAtFront < initialExtraChars) {
-                    extraCharsAtFront++;
-                    if (extraCharsAtEnd > 0) extraCharsAtEnd--;
-                    currentChar--;
+    const handleKeyDown = useCallback((e) => {
+      if (enabled) {
+          if (e.keyCode === 8) {
+              if (extraCharsAtFront < initialExtraChars) {
+                  extraCharsAtFront++;
+                  if (extraCharsAtEnd > 0) extraCharsAtEnd--;
+                  currentChar--;
 
-                    var className =
-                        propsTextArray[currentChar].props.className + " erased";
+                  var className =
+                      propsTextArray.current[currentChar].props.className + " erased";
 
-                    propsTextArray[currentChar] = (
-                        <div className={className} key={currentChar}>
-                            <pre>
-                                {
-                                    props.textArray[currentChar].props.children
-                                        .props.children
-                                }
-                            </pre>
-                        </div>
-                    );
-                    props.setTextArray(propsTextArray);
-                }
-                setDisplayTextArray();
-            }
-        }
-    };
+                  propsTextArray.current[currentChar] = (
+                      <div className={className} key={currentChar}>
+                          <pre>
+                              {
+                                  props.textArray[currentChar].props.children
+                                      .props.children
+                              }
+                          </pre>
+                      </div>
+                  );
+                  props.setTextArray(propsTextArray.current);
+              }
+              setDisplayTextArray();
+          }
+      }
+    }, [enabled, props, setDisplayTextArray]);
 
     useEffect(() => {
         window.addEventListener("keypress", handleKeyPress);
@@ -315,14 +315,14 @@ const Input = (props) => {
         return () => {
             window.removeEventListener("keypress", handleKeyPress);
         };
-    }, [enabled]);
+    }, [enabled, handleKeyPress]);
 
     useEffect(() => {
         window.addEventListener("keydown", handleKeyDown);
         return () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
-    }, [enabled]);
+    }, [enabled, handleKeyDown]);
 
     const endTimer = () => {
         setEnabled(0);
